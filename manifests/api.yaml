@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-poc
+  namespace: default
+  labels:
+    app: api-poc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-poc
+  template:
+    metadata:
+      labels:
+        app: api-poc
+    spec:
+      containers:
+        - name: api-poc
+          image: marcozoveralli/rest-api-poc
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10000
+          env:
+            - name: ISSUER
+              value: https://dev-01793070.okta.com/oauth2/default
+            - name: JWKS_URI
+              value: https://dev-01793070.okta.com/oauth2/default/v1/keys
+            - name: AUDIENCE
+              value: api://default
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-poc-svc
+  namespace: default
+  labels:
+    app: api-poc-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 1010
+      protocol: TCP
+      nodePort: 30080
+      name: http-api
+      targetPort: 10000
+  selector:
+    app: api-poc

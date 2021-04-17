@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: command-demo-privileged
+  namespace: default
+  labels:
+    purpose: demonstrate-command
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      securityContext:
+        runAsUser: 0
+      automountServiceAccountToken: false
+      volumes:
+        - name: private-rsa
+          emptyDir: {}
+      containers:
+      - name: command-demo-container
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: private-rsa
+            mountPath: /home/private-rsa
+        image: debian
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 10;done"]

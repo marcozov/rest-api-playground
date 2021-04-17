@@ -1,0 +1,14 @@
+{{template "header" .}}
+
+
+<div id="content" class="ui text container">
+  <h2>Showing articles</h2>
+
+{{ if .Articles }}
+  <div>
+    <p>Articles retrieved: {{ .Articles }}</p>
+  </div>
+{{end}}
+
+</div>
+{{template "footer"}}

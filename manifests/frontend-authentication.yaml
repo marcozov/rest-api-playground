@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: default
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: marcozoveralli/authorization-frontend-poc
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 10000
+          env:
+            - name: CLIENT_ID
+              value: 0oa5xb7acmBgBVLJi5d6
+            # not a good practice, but okta client is used for nothing
+            - name: CLIENT_SECRET
+              value: jhP5kp5d28-tyAEvE9MBNmCLjyupKiZtG3tcWtQ8
+            - name: ISSUER
+              value: https://dev-01793070.okta.com/oauth2/default
+            - name: BACKEND_URL
+              #value: http://127.0.0.1:10000
+              value: http://api-poc-svc.default.svc.cluster.local:1010
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  namespace: default
+  labels:
+    app: frontend-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      protocol: TCP
+      nodePort: 30081
+      name: http-api
+      targetPort: 8080
+  selector:
+    app: frontend
